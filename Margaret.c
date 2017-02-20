@@ -1,9 +1,9 @@
-#pragma config(Sensor, dgtl1,  quadRight,      sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  quadLeft,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl1,  encLiftRight,      sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  encLiftLeft,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  encClawRight,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl7,  encClawLeft,    sensorQuadEncoder)
-#pragma config(Sensor, dgtl9,  encRightSide,   sensorQuadEncoder)
-#pragma config(Sensor, dgtl11, encLeftSide,    sensorQuadEncoder)
+#pragma config(Sensor, dgtl9,  encDriveRight,   sensorQuadEncoder)
+#pragma config(Sensor, dgtl11, encDriveLeft,    sensorQuadEncoder)
 #pragma config(Motor,  port1,           clawLeft,      tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           lift2,         tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           lift1,         tmotorVex393_MC29, openLoop, reversed)
@@ -26,7 +26,7 @@
 
 #include "Vex_Competition_Includes.c"
 
-#define getQuadVal() ( ( abs(SensorValue[quadRight]) + abs(SensorValue[quadLeft]) ) / 2 )
+#define getQuadVal() ( ( abs(SensorValue[encLiftRight]) + abs(SensorValue[encLiftLeft]) ) / 2 )
 
 #define CR clawRight //reconcile differences in the port in #pragma with #define
 #define CL clawLeft
@@ -39,17 +39,16 @@ const int PIDTHRESHOLD = 30;
 bool thresholdOn = true;
 bool clawPIDRunning = true;
 bool pressedLastCycle = false;
-float clawTarget;
+//float clawTarget;
 
-int getClawAvg()
+/*task getClawAvg()
 {
 	while (true) {
-		float quadRightVal = abs(SensorValue[quadRight]);
-		float quadLeftVal = abs(SensorValue[quadLeft]);
-		clawTarget = (quadRightVal + quadLeftVal)/2;
+		float encLiftRightVal = abs(SensorValue[encLiftRight]);
+		float encLiftLeftVal = abs(SensorValue[encLiftLeft]);
+		clawTarget = (encLiftRightVal + encLiftLeftVal)/2;
 	}
-
-}
+}*/
 
 void drive(int rot1, int trans1)
 {
@@ -101,21 +100,24 @@ float pid(float kp, float ki, float kd, float target, float &error, float &error
 
 void pre_auton()
 {
-	SensorValue[quadRight] = 0;
-	SensorValue[quadLeft] = 0;
+	SensorValue[encLiftRight] = 0;
+	SensorValue[encLiftLeft] = 0;
 	SensorValue[encClawRight] = 0;
 	SensorValue[encClawLeft] = 0;
+	SensorValue[encDriveRight] = 0;
+	SensorValue[encDriveLeft] = 0;
+
 }
 
 task pincerPID()
 {
-	const float L_claw_kp = 3.3;
-	const float L_claw_ki = 0.0000001;
-	const float L_claw_kd = 2;
+	const float L_claw_kp = 9.0;
+	const float L_claw_ki = 0.01;
+	const float L_claw_kd = 0.5;
 
-	const float R_claw_kp = 3.3;
-	const float R_claw_ki = 0.0000001;
-	const float R_claw_kd = 2;
+	const float R_claw_kp = 9.0;
+	const float R_claw_ki = 0.01;
+	const float R_claw_kd = 0.5;
 
 	float L_claw_error = 0;
 	float L_claw_prevError = 0;
@@ -136,8 +138,8 @@ task pincerPID()
 			L_claw_sensVal = SensorValue(encClawLeft);
 			R_claw_sensVal = SensorValue(encClawRight);
 
-			motorLClawOutput = pid(L_claw_kp, L_claw_ki, L_claw_kd, clawTarget, L_claw_error, L_claw_errorTotal, L_claw_prevError, L_claw_sensVal);
-			motorRClawOutput = pid(R_claw_kp, R_claw_ki, R_claw_kd, clawTarget, R_claw_error, R_claw_errorTotal, R_claw_prevError, R_claw_sensVal);
+			motorLClawOutput = pid(L_claw_kp, L_claw_ki, L_claw_kd, clawSetPoint, L_claw_error, L_claw_errorTotal, L_claw_prevError, L_claw_sensVal);
+			motorRClawOutput = pid(R_claw_kp, R_claw_ki, R_claw_kd, clawSetPoint, R_claw_error, R_claw_errorTotal, R_claw_prevError, R_claw_sensVal);
 
 			motor[CL] = motorLClawOutput;
 			motor[CR] = motorRClawOutput;
@@ -157,6 +159,7 @@ task pincerPID()
 //	sleep(1500);
 //}
 
+/*
 void runSequenceStep(int driveRot, int driveTrans, int clawValue, int liftValue)
 {
 	drive(driveRot, driveTrans);
@@ -282,36 +285,36 @@ task timeAuton()
 	stopTask(autonomous);
 	//startTask(usercontrol);
 }
+*/
 
 task autonomous()
 {
 	//startTask(timeAuton);
 	pre_auton();
 	startTask(pincerPID);
-	if(SensorValue[skills] == 1)
+	/*if(SensorValue[skills] == 1)
 		runAutonomousSequenceSkills();
 	else
 		if(SensorValue[autonomousSide] == 0)
 			runAutonomousSequenceRight();
 		else
-			runAutonomousSequenceLeft();
+			runAutonomousSequenceLeft();*/
 }
 
 //task usercontrol()
 //{
 //	pre_auton();
 //	startTask(pincerPID);
-
-//	startTask(autonomous);
-
 //}
 
 // Controls the Claw of the Robot During the User Control Portion of the Competition
 task updatePincerUserControl()
 {
 	int CLsens, CRsens;
-
+	float clawSetPoint;
 	int lastTime = 0;
+	int CLAW_MIN_ROTATION = 0;
+	int CLAW_MAX_ROTATION = 1203812812048239516314938174023903958123856139856123410230542365;
 	while(true)
 	{
 		CLsens = SensorValue(CLenc);
@@ -323,7 +326,7 @@ task updatePincerUserControl()
 			sleep(30);
 			motor[CL] = 0;
 			motor[CR] = 0;
-			clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+			clawSetPoint = (CLsens + CRsens) / 2.0;
 			lastTime = time1[T1];
 		}
 		else {
@@ -333,7 +336,7 @@ task updatePincerUserControl()
 				// open claw fast
 				if(CLsens > CLAW_MIN_ROTATION) motor[CL] = -127;
 				if(CRsens > CLAW_MIN_ROTATION) motor[CR] = -127;
-				clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+				clawSetPoint = (CLsens + CRsens) / 2.0;
 				lastTime = time1[T1];
 			}
 			else if (vexRT[Btn6U] == 1 || vexRT[Btn6DXmtr2] == 1)
@@ -342,7 +345,7 @@ task updatePincerUserControl()
 				// close claw fast
 				if(CLsens < CLAW_MAX_ROTATION) motor[CL] = 127;
 				if(CRsens < CLAW_MAX_ROTATION) motor[CR] = 127;
-				clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+				clawSetPoint = (CLsens + CRsens) / 2.0;
 				lastTime = time1[T1];
 			}
 			else if (vexRT[Btn6D] == 1 || vexRT[Btn5DXmtr2] == 1)
@@ -351,7 +354,7 @@ task updatePincerUserControl()
 				// close claw slow
 				if(CLsens < CLAW_MAX_ROTATION) motor[CL] = 30;
 				if(CRsens < CLAW_MAX_ROTATION) motor[CR] = 30;
-				clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+				clawSetPoint = (CLsens + CRsens) / 2.0;
 				lastTime = time1[T1];
 			}
 			else if (vexRT[Btn5D] == 1 || vexRT[Btn5UXmtr2] == 1)
@@ -360,13 +363,13 @@ task updatePincerUserControl()
 				// open claw slow
 				if(CLsens > CLAW_MIN_ROTATION) motor[CL] = -30;
 				if(CRsens > CLAW_MIN_ROTATION) motor[CR] = -30;
-				clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+				clawSetPoint = (CLsens + CRsens) / 2.0;
 				lastTime = time1[T1];
 			}
 			else
 			{
 				if(time1[T1] - lastTime < 300) {
-					clawSetPoint = (CLsens + CRsens) / (2.0 * CLAW_GEAR_RATIO);
+					clawSetPoint = (CLsens + CRsens) / 2.0;
 				}
 				clawPIDRunning = true;
 			}
@@ -383,20 +386,22 @@ task updatePincerUserControl()
 //learn how to find length of array to put in for loop!!!!!!!!!!!
 //sweep back two stars with cube
 //collect encoder data with test and debug with writeDebugStreamLine
-//find out whats overloading robot?? repeatedly starting tasks in ueser control?
+//find out whats overloading robot?? repeatedly starting tasks in user control?
 
 task usercontrol()
 {
 	pre_auton();
 	int t1 = 0, r1 = 0, motorThreshold = 25;
-	startTask(getClawAvg);
 	startTask(pincerPID);
 	startTask(updatePincerUserControl);
 
 	while(true){
-		if(vexRT[Btn7R] == 1){
-			//startTask(autonomous);
-		}
+		if(vexRT[Btn7R] == 1)
+			startTask(autonomous);
+
+		if(vexRT[Btn7L] == 1)
+			stopTask(autonomous);
+
 
 		if(abs(vexRT[Ch1]) > motorThreshold)
 			r1 = vexRT[Ch1];
