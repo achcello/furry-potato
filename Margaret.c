@@ -35,6 +35,7 @@
 
 const float INTEGRAL_ACTIVE_ZONE = 50.0;
 const int PIDTHRESHOLD = 30;
+float clawSetPoint = 0;
 
 bool thresholdOn = true;
 bool clawPIDRunning = true;
@@ -311,7 +312,6 @@ task autonomous()
 task updatePincerUserControl()
 {
 	int CLsens, CRsens;
-	float clawSetPoint;
 	int lastTime = 0;
 	int CLAW_MIN_ROTATION = 0;
 	int CLAW_MAX_ROTATION = 1203812812048239516314938174023903958123856139856123410230542365;
