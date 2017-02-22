@@ -483,10 +483,10 @@ void driveExactly(int distance)
 
 
 	while(abs(target - SensorValue[encDriveLeft]) > 360){
-		drive(0,multiplier * 85);
+		drive(0,multiplier * 127);
 	}
 
-	while(abs(target - SensorValue[encDriveLeft]) > 40){
+	while(abs(target - SensorValue[encDriveLeft]) > 50){
 		drive(0,multiplier*50);
 	}
 	while(abs(target - SensorValue[encDriveLeft]) < 3){
@@ -510,7 +510,7 @@ task autoAdjustMotors()
 	while(true){
 		left1 = SensorValue[encClawLeft]; //gets initial value
 		right1 = -1 * SensorValue[encClawRight];
-		wait1Msec(100);
+		wait1Msec();
 		left = abs(SensorValue[encClawLeft] - left1);
 		right = abs(SensorValue[encClawRight] - right1);
 

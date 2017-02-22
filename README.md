@@ -1,2 +1,2 @@
 # furry-potato
-for all potatoes which are furrry
+Margaret Thatcher is a robot. The code here is developed for the VEX Robotics competition, Starstruck.
