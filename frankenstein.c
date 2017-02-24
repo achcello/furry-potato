@@ -79,7 +79,7 @@ const int DRIVE_CLOSE_ENOUGH = 10;
 // Drive
 // Speed Motor Limit: Current Value
 // Torque Motor Limit: 127
-const float DRIVE_POWER_LIMIT = 127*0.75;
+const float DRIVE_POWER_LIMIT = 127*0.8;
 
 
 /////////////////////////////////////////////////         Non-Constants         ////////////////////////////////////////////
@@ -104,8 +104,8 @@ float clawSetPoint = 0;
 
 void drive(int rot1, int trans1)
 {
-  motor[port4] = 0.75*(trans1 + rot1);
-  motor[port5] = 0.75*(trans1 - rot1);
+  motor[port4] = 0.8*(trans1 + rot1);
+  motor[port5] = 0.8*(trans1 - rot1);
 }
 
 void lift(int liftPower)
@@ -439,8 +439,29 @@ task updatePincerUserControl()
 
 task autonomous()
 {
-  //using setDriveSetPoint(), you should theoretically be able to set a distance and a direction.
-  //syntax: setDriveSetPoint([inches or degrees], [direction from lines 41-46]);
+  //startTask(timeAuton);
+  /*encClawClear();
+  encLiftClear();
+  encDriveClear();
+  startTask(pincerPID);
+  //startTask(autoAdjustMotors);
+  driveExactly(72);
+  clawSetPoint = -160;
+  wait1Msec(2000);
+  lift(127);
+  wait1Msec(2000);
+  lift(0);
+  driveExactly(-72);
+  clawSetPoint = 0;
+  wait10Msec(20);
+  stopAllTasks();
+  /*if(SensorValue[skills] == 1)
+    runAutonomousSequenceSkills();
+  else
+    if(SensorValue[autonomousSide] == 0)
+      runAutonomousSequenceRight();
+    else
+      runAutonomousSequenceLeft();*/
 }
 
 task usercontrol()
