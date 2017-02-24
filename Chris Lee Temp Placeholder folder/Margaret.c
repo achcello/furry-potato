@@ -146,6 +146,7 @@ task liftExactly(){
 		direction = -1;
 	while(abs(liftHeight - getLiftHeight()) > 10)
 		lift(127 * direction);
+	lift(0);
 	autonomousCheckPoint++;
 }
 
