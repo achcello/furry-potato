@@ -439,29 +439,8 @@ task updatePincerUserControl()
 
 task autonomous()
 {
-  //startTask(timeAuton);
-  /*encClawClear();
-  encLiftClear();
-  encDriveClear();
-  startTask(pincerPID);
-  //startTask(autoAdjustMotors);
-  driveExactly(72);
-  clawSetPoint = -160;
-  wait1Msec(2000);
-  lift(127);
-  wait1Msec(2000);
-  lift(0);
-  driveExactly(-72);
-  clawSetPoint = 0;
-  wait10Msec(20);
-  stopAllTasks();
-  /*if(SensorValue[skills] == 1)
-    runAutonomousSequenceSkills();
-  else
-    if(SensorValue[autonomousSide] == 0)
-      runAutonomousSequenceRight();
-    else
-      runAutonomousSequenceLeft();*/
+  //using setDriveSetPoint(), you should theoretically be able to set a distance and a direction.
+  //syntax: setDriveSetPoint([inches or degrees], [direction from lines 41-46]);
 }
 
 task usercontrol()
