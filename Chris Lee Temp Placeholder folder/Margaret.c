@@ -35,7 +35,7 @@ bool pincerMan = false;
 bool pressedLastCycle = false;
 
 //drive exactly constants
-int driveThreshold = 25;
+int driveThreshold = 15;
 bool driveThresholdOn = true;
 int distance = 0;
 int angle = 0;
@@ -79,7 +79,7 @@ task driveExactly()
 	//forwards is positive
 	//27.7 ticks per inch
 	if(angle == 0 && distance != 0){
-		float kp = 0.75;
+		float kp = 0.40;
 		driveThresholdOn = true;
 
 		int direction = 1;
@@ -88,7 +88,7 @@ task driveExactly()
 
 		int target = distance * 27.7;
 
-		while(abs(target - SensorValue[encDriveLeft]) > 10){
+		while(abs(target - SensorValue[encDriveLeft]) > 15){
 			int driveMotorSpeed = abs(target - SensorValue[encDriveLeft]) * kp;
 			if(driveMotorSpeed > 127)//delete this if we remove 0.75 from drive function
 				driveMotorSpeed = 127;
@@ -100,8 +100,10 @@ task driveExactly()
 
 		direction = direction * -1;
 
-		drive(0,127 * direction);
-		wait1Msec(100);
+		for(int x = 0; x <= 80; x++){
+			drive(0,x * direction);
+			wait1Msec(2);
+		}
 
 		drive(0,0);
 	}
@@ -143,8 +145,8 @@ task driveExactly()
 int getLiftHeight()
 {
 	int quadRightVal = abs(SensorValue[encLiftRight]);
-	int quadLeftVal = abs(SensorValue[encLiftLeft]);
-	return (quadRightVal + quadLeftVal)/2;
+	//int quadLeftVal = abs(SensorValue[encLiftLeft]);
+	return (quadRightVal); //+ quadLeftVal)/2;
 }
 
 task liftExactly(){
@@ -332,6 +334,7 @@ void runAutonomousRight()
 		runSequenceStep(autonomousRight[x][0],autonomousRight[x][1],autonomousRight[x][2],autonomousRight[x][3], autonomousRight[x][4]);
 		while(autonomousCheckPoint != 3){
 			//waits for all task to finish
+
 		}
 	}
 }

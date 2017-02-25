@@ -17,13 +17,13 @@
 int leftAdjustment = 0;
 int rightAdjustment = 0;
 
-int driveThreshold = 25;
+int driveThreshold = 0;
 bool driveThresholdOn = true;
 
 void drive(int rot1, int trans1)
 {
 	motor[rightWheel] = 0.75*(trans1 - rot1) + rightAdjustment;
-	motor[leftWheel] = 0.75*(trans1 + rot1) + leftAdjustment;
+	motor[leftWheel] = 0.95*(trans1 + rot1) + leftAdjustment;
 }
 
 void driveExactly(int distance, int angle)
@@ -38,16 +38,16 @@ void driveExactly(int distance, int angle)
 	//forwards is positive
 	//27.7 ticks per inch
 	if(angle == 0 && distance != 0){
-		float kp = 0.75;
+		float kp = 0.5;
 		driveThresholdOn = true;
 
 		int direction = 1;
 		if(distance < 0)
 			direction = -1;
 
-		int target = distance * 27.7;
+		int target = distance * 27.68;
 
-		while(abs(target - SensorValue[encDriveLeft]) > 10){
+		while(abs(target - SensorValue[encDriveLeft]) > 20){
 			int driveMotorSpeed = abs(target - SensorValue[encDriveLeft]) * kp;
 			if(driveMotorSpeed > 127)//delete this if we remove 0.75 from drive function
 				driveMotorSpeed = 127;
@@ -70,14 +70,14 @@ void driveExactly(int distance, int angle)
 	//clockwise is positive
 	//3.66 ticks per angle
 	if(angle != 0 && distance == 0){
-		float kp = 2.0;
+		float kp = 2.5;
 		driveThresholdOn = true;
 
 		int direction = 1;
 		if(angle < 0)
 			direction = -1;
 
-		int target = angle * 3.66;
+		int target = angle * 3.52;
 
 		while(abs(target - SensorValue[encDriveLeft]) > 10){
 			int driveMotorSpeed = abs(target - SensorValue[encDriveLeft]) * kp;
@@ -107,7 +107,7 @@ task autoAdjustMotors()
 	int left = 0;
 	int right = 0;
 
-	int kp = 2;
+	int kp = 1;
 
 	while(true){
 		left = SensorValue[encDriveLeft]; //gets initial value
@@ -119,12 +119,12 @@ task autoAdjustMotors()
 		error = abs(left - right);
 
 		if(left > right){
-			leftAdjustment = 0;
-			rightAdjustment = error/kp;
+			leftAdjustment = -error/kp;
+			rightAdjustment = 0;
 		}
 		else if(left < right){
-			leftAdjustment = error/kp;
-			rightAdjustment = 0;
+			leftAdjustment = 0;
+			rightAdjustment = -error/kp;
 		}
 		else{
 			leftAdjustment = 0;
@@ -147,8 +147,10 @@ task main()
 	//FIX AUTONOMOUS CODE FOR DIFFERENT SEQUENCES
 	//clean up claw pid code
 
+	SensorValue[encDriveLeft] = 0;
+	SensorValue[encDriveRight] = 0;
 	//startTask(autoAdjustMotors);
 
 	wait1Msec(1000);
-	driveExactly(36,0);
+	driveExactly(0,45);
 }
