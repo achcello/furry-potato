@@ -1,14 +1,14 @@
-#pragma config(Sensor, dgtl1,  encLiftRight,      sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  encLiftLeft,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl1,  encLiftRight,   sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  encLiftLeft,    sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  encClawRight,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl7,  encClawLeft,    sensorQuadEncoder)
-#pragma config(Sensor, dgtl9,  encDriveRight,   sensorQuadEncoder)
-#pragma config(Sensor, dgtl11, encDriveLeft,    sensorQuadEncoder)
+#pragma config(Sensor, dgtl9,  encDriveRight,  sensorQuadEncoder)
+#pragma config(Sensor, dgtl11, encDriveLeft,   sensorQuadEncoder)
 #pragma config(Motor,  port1,           clawLeft,      tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           lift3,         tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           lift2,         tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port4,           driveLeft,     tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           driveRight,    tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port4,           leftWheel,     tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port5,           rightWheel,    tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           lift4,         tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           lift1,         tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port10,          clawRight,     tmotorVex393_HBridge, openLoop)
@@ -22,8 +22,8 @@ bool driveThresholdOn = true;
 
 void drive(int rot1, int trans1)
 {
-	motor[driveRight] = 0.75*(trans1 - rot1) + rightAdjustment;
-	motor[driveLeft] = 0.75*(trans1 + rot1) + leftAdjustment;
+	motor[rightWheel] = 0.75*(trans1 - rot1) + rightAdjustment;
+	motor[leftWheel] = 0.75*(trans1 + rot1) + leftAdjustment;
 }
 
 void driveExactly(int distance, int angle)
@@ -144,8 +144,9 @@ task main()
 	//IF ONE DRIVE MOTOR BREAKS, CUT OTHER SIDE IN HALF????
 	//IMPLEMENT MORE CONCISE PID IN DRIVE EXACTLY??
 	//FIX AUTONOMOUS CODE FOR DIFFERENT SEQUENCES
+	//clean up claw pid code
 
-	startTask(autoAdjustMotors);
+	//startTask(autoAdjustMotors);
 
 	wait1Msec(1000);
 	driveExactly(36,0);
