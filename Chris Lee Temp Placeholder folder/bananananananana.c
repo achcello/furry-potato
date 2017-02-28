@@ -1,9 +1,7 @@
 
-//{translation,rotation,claw,lift,lock}
+//{translation,rotation,claw,lift,lock, time}
 int autonomousRight[][] = {
-	{12,0,0,130,0},
-	{38,0,0,0,0},
-	{0,180,0,0,0}
+	{12,0,-80,130,0,0}
 };
 
 int autonomousLeft[][] = {

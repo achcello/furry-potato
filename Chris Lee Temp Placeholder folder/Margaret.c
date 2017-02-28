@@ -336,6 +336,8 @@ void runAutonomousRight()
 			//waits for all task to finish
 
 		}
+		wait1Msec(autonomousRight[x][5]);
+		lock = false;
 	}
 }
 
@@ -353,8 +355,6 @@ task autonomous()
 {
 	pre_auton();
 	autonomousRunning =true;
-	startTask(pincerPID);
-	//startTask(pincerPID);
 	if(autonomousSequence == 1)
 		runAutonomousRight();
 }
@@ -362,35 +362,40 @@ task autonomous()
 task usercontrol()
 {
 	pre_auton();
-	autonomousRunning =false;
-	int t1 = 0, r1 = 0, motorThreshold = 15;
+	autonomousRunning = true;
+	clawSetPoint = -80;
 	startTask(pincerPID);
-	startTask(updatePincerUserControl);
 
-	while(true){
-		if(vexRT[Btn7R] == 1){
-			//startTask(autonomous);
-		}
+	//pre_auton();
+	//autonomousRunning =false;
+	//int t1 = 0, r1 = 0, motorThreshold = 15;
+	//startTask(pincerPID);
+	//startTask(updatePincerUserControl);
 
-		if(abs(vexRT[Ch1]) > motorThreshold)
-			r1 = vexRT[Ch1];
-		else
-			r1 = 0;
+	//while(true){
+	//	if(vexRT[Btn7R] == 1){
+	//		//startTask(autonomous);
+	//	}
 
-		if(abs(vexRT[Ch2]) > motorThreshold)
-			t1 = vexRT[Ch2];
-		else
-			t1 = 0;
+	//	if(abs(vexRT[Ch1]) > motorThreshold)
+	//		r1 = vexRT[Ch1];
+	//	else
+	//		r1 = 0;
 
-		if (abs(vexRT[Ch3]) > motorThreshold)
-		{
-			lift(vexRT[Ch3]);
-		}
-		else
-		{
-			lift(0);
-		}
+	//	if(abs(vexRT[Ch2]) > motorThreshold)
+	//		t1 = vexRT[Ch2];
+	//	else
+	//		t1 = 0;
 
-		drive(r1,t1);
-	}
+	//	if (abs(vexRT[Ch3]) > motorThreshold)
+	//	{
+	//		lift(vexRT[Ch3]);
+	//	}
+	//	else
+	//	{
+	//		lift(0);
+	//	}
+
+	//	drive(r1,t1);
+	//}
 }

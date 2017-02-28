@@ -146,6 +146,9 @@ task main()
 		//for a more concise PID, can't you use the default PID framework? the pid(float kp, float ki, float kd, float target, float &error, float &errorTotal, float &prevError, float sensVal)?
 	//FIX AUTONOMOUS CODE FOR DIFFERENT SEQUENCES
 	//clean up claw pid code
+	//add time delay on autonomous
+	//make drive exactly smoother
+	//check if 127 is double distance of 63
 
 	SensorValue[encDriveLeft] = 0;
 	SensorValue[encDriveRight] = 0;
